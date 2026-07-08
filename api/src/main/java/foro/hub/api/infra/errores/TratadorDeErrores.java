@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -43,6 +44,16 @@ public class TratadorDeErrores {
     @ExceptionHandler(AuthenticationFailedException.class)
         public ResponseEntity errorHandlerAuthenticationException(Exception e){
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity errorHandlerJsonNotValidException(HttpMessageNotReadableException e) {
+        return ResponseEntity.badRequest().body("JSON mal formado o estructura invalida.");
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity errorHandlerInternalErrorException(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error inespeado, intenta mas tarde.");
     }
 
 

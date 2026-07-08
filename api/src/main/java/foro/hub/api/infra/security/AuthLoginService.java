@@ -4,6 +4,9 @@ import foro.hub.api.domain.usuarios.DTOAuthUsuario;
 import foro.hub.api.domain.usuarios.IntentosLoginService;
 import foro.hub.api.domain.usuarios.Usuario;
 import foro.hub.api.infra.errores.AuthenticationFailedException;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,7 +27,7 @@ public class AuthLoginService {
     private TokenService tokenService;
 
 
-    public DTOJWTToken autenticarUsuario(DTOAuthUsuario datosAutenticacionUsuario){
+    public DTOJWTToken autenticarUsuario(@RequestBody @Valid DTOAuthUsuario datosAutenticacionUsuario){
         String key = datosAutenticacionUsuario.login();
 
         if(intentosLoginService.estaBloqueado(key)){

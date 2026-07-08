@@ -5,6 +5,7 @@ import foro.hub.api.domain.perfil.PerfilRepository;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,7 +17,7 @@ public class UsuarioService {
     private PerfilRepository perfilRepository;
 
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     public DTOResponseUsuario registrarUsuario(DTORegistroUsuario dtoRegistroUsuario){
 
@@ -35,7 +36,7 @@ public class UsuarioService {
         Usuario nuevoUsuario = new Usuario(dtoRegistroUsuario);
 
       //  nuevoUsuario.setPerfil(new Perfil(dtoRegistroUsuario.nombrePerfil()));
-        nuevoUsuario.setClave(bCryptPasswordEncoder.encode(nuevoUsuario.getPassword()));
+        nuevoUsuario.setClave(passwordEncoder.encode(nuevoUsuario.getPassword()));
 
         usuarioRepository.save(nuevoUsuario);
 

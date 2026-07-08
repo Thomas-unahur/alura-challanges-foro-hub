@@ -1,4 +1,10 @@
 package foro.hub.api.domain.usuarios;
 
-public record DTOAuthUsuario(String login, String clave) {
+import jakarta.validation.constraints.NotBlank;
+
+public record DTOAuthUsuario(
+    @NotBlank
+    String login,
+    @NotBlank 
+    String clave) {
 }
