@@ -1,4 +1,4 @@
-package foro.hub.api;
+package foro.hub.api.ControllerTest;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
