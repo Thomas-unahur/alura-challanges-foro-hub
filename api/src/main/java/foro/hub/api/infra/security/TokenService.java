@@ -45,12 +45,15 @@ public class TokenService {
                     .build()
                     .verify(token);
             verifier.getSubject();
-        } catch (JWTVerificationException exception) {
-            System.out.println(exception.toString());
-        }
+            
         if (verifier.getSubject() == null) {
-            throw new RuntimeException("Verifier invalido");
+            throw new RuntimeException("Verifier invalido: Subject nulo");
         }
+
+        } catch (JWTVerificationException exception) {
+            throw new JWTVerificationException("Token JWT invalido o expirado: " + exception.getMessage());
+        }
+        
         return verifier.getSubject();
     }
 

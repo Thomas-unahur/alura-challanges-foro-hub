@@ -1,4 +1,4 @@
-package foro.hub.api.ServiceTests;
+package foro.hub.api.ServiceTests.Authentication;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
