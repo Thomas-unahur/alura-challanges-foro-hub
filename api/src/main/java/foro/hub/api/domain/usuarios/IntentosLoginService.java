@@ -1,5 +1,6 @@
 package foro.hub.api.domain.usuarios;
 
+import com.google.common.base.Ticker;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -14,9 +15,15 @@ public class IntentosLoginService {
     private LoadingCache<String,Integer> intentosEnCache;
 
     public IntentosLoginService(){
+        this(Ticker.systemTicker());
+    }
+
+    public IntentosLoginService(Ticker ticker){
         super();
         intentosEnCache = CacheBuilder.newBuilder()
-                .expireAfterWrite(15, TimeUnit.MINUTES).build(new CacheLoader<String,Integer>(){
+                .expireAfterWrite(15, TimeUnit.MINUTES)
+                .ticker(ticker)
+                .build(new CacheLoader<String,Integer>(){
                     public Integer load(String key){
                         return 0;
                     }
@@ -46,3 +53,5 @@ public class IntentosLoginService {
         }
     }
 }
+
+
