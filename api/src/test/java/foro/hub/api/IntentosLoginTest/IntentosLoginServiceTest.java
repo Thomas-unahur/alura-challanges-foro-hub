@@ -23,12 +23,12 @@ public class IntentosLoginServiceTest {
         usuarioPrueba = "usuario_prueba";
     }
 
-    public void simularFallos(String usuario, Integer cantidad){ 
+    private void simularFallos(String usuario, Integer cantidad){ 
         for(Integer i=0;i<cantidad;i++){
             intentosLoginService.inicioDeSesionFallido(usuario);
         }   
     }
-    public void bloquearUsuario(String usuario){
+    private void bloquearUsuario(String usuario){
         simularFallos(usuario, 5);
     }
 

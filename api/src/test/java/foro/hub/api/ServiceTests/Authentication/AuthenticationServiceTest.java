@@ -3,7 +3,11 @@ package foro.hub.api.ServiceTests.Authentication;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,12 +37,13 @@ public class AuthenticationServiceTest {
         String username= "usuario_prueba";
         Usuario usuarioSimulado = new Usuario();
 
-        when(usuarioRepository.findByLogin(username)).thenReturn(usuarioSimulado);
+        when(usuarioRepository.findByLogin(username)).thenReturn(Optional.of(usuarioSimulado));
 
         UserDetails resultado = authenticationService.loadUserByUsername(username);
 
         assertNotNull(resultado);
         assertEquals(usuarioSimulado, resultado);
+        verify(usuarioRepository, times(1)).findByLogin(username);
     }
 
     @Test
@@ -46,7 +51,7 @@ public class AuthenticationServiceTest {
     void testElUsuarioNoExisteYLanzaUserNotFoundException(){
         String username= "usuario_erroneo";
 
-        when(usuarioRepository.findByLogin(username)).thenReturn(null);
+        when(usuarioRepository.findByLogin(username)).thenReturn(Optional.empty());
         assertThrows(UsernameNotFoundException.class, 
             () -> authenticationService.loadUserByUsername(username)
         );

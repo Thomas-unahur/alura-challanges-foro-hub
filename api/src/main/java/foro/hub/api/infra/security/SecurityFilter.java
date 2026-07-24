@@ -32,7 +32,7 @@ public class SecurityFilter extends OncePerRequestFilter {
                 // Token valido
                 var usuario = usuarioRepository.findByLogin(nombreUsuario);
                 var authentication = new UsernamePasswordAuthenticationToken(usuario, null,
-                        usuario.getAuthorities()); // Forzamos un inicio de sesion
+                        usuario.get().getAuthorities()); // Forzamos un inicio de sesion
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }

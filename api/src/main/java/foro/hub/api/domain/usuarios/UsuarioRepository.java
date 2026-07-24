@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Optional;
 
 public interface UsuarioRepository extends JpaRepository<Usuario,Long> {
-    UserDetails findByLogin(String username);
+    Optional<UserDetails> findByLogin(String username);
     Optional<Usuario> findByEmail(String email);
 
     @Query("SELECT u FROM Usuario u WHERE u.login= :login")
