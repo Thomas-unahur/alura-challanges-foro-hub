@@ -4,6 +4,7 @@ package foro.hub.api.domain.topico;
 import foro.hub.api.domain.curso.Curso;
 import foro.hub.api.domain.usuarios.Usuario;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,9 @@ import java.util.Date;
 @Table(name = "topicos")
 @Entity(name = "Topico")
 @Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class Topico {
 

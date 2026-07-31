@@ -22,7 +22,7 @@ public class AutenticacionController {
     AuthLoginService authLoginService;
 
     @PostMapping
-    public ResponseEntity autenticarUsuario(@RequestBody @Valid DTOAuthUsuario datosAutenticacionUsuario) {
+    public ResponseEntity<DTOJWTToken> autenticarUsuario(@RequestBody @Valid DTOAuthUsuario datosAutenticacionUsuario) {
         DTOJWTToken dtojwtToken = authLoginService.autenticarUsuario(datosAutenticacionUsuario);
         return ResponseEntity.ok(dtojwtToken);
     }

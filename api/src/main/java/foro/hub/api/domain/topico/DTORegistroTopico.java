@@ -1,7 +1,6 @@
 package foro.hub.api.domain.topico;
 
 import foro.hub.api.domain.curso.DTOCurso;
-import foro.hub.api.domain.usuarios.Usuario;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

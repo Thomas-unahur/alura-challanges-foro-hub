@@ -25,7 +25,7 @@ public class RespuestaController {
     @Transactional
     @PostMapping
     @Operation(summary = "Registra una nueva respuesta a un tópico en la base de datos.")
-    ResponseEntity registrarRespuesta(@RequestBody @Valid DTORegistroRespuesta dtoRegistroRespuesta,
+    ResponseEntity<DTOResponseRespuesta> registrarRespuesta(@RequestBody @Valid DTORegistroRespuesta dtoRegistroRespuesta,
                                       UriComponentsBuilder uriComponentsBuilder){
         DTOResponseRespuesta nuevaRespuesta = respuestaService.registrarRespuesta(dtoRegistroRespuesta);
         URI url = uriComponentsBuilder.path("/respuestas/{id}").buildAndExpand(nuevaRespuesta.id()).toUri();
@@ -37,7 +37,7 @@ public class RespuestaController {
     @Transactional
     @PutMapping
     @Operation(summary = "Permite editar una respuesta a un tópico en la base de datos.")
-    ResponseEntity actualizarRespuesta(@RequestBody @Valid DTOActualizarRespuesta dtoActualizarRespuesta){
+    ResponseEntity<DTOResponseRespuesta> actualizarRespuesta(@RequestBody @Valid DTOActualizarRespuesta dtoActualizarRespuesta){
         DTOResponseRespuesta dtoResponseRespuesta = respuestaService.actualizarRespuesta(dtoActualizarRespuesta);
         return ResponseEntity.ok(dtoResponseRespuesta);
     }

@@ -7,10 +7,10 @@ import foro.hub.api.domain.usuarios.DTOInfoUsuario;
 import foro.hub.api.domain.usuarios.Usuario;
 import foro.hub.api.infra.errores.AuthorizationException;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,86 +18,98 @@ import java.util.List;
 
 
 @Service
+@RequiredArgsConstructor
 public class TopicoService {
-    @Autowired
-    private TopicoRepository topicoRepository;
-    @Autowired
-    List<ValidadorDeDuplicados> validadores;
+    
+    private final TopicoRepository topicoRepository;
+    
+    private final List<ValidadorDeDuplicados> validadores;
+    
+    private final RespuestaRepository respuestaRepository;
 
-    @Autowired
-    RespuestaRepository respuestaRepository;
+    @Transactional
+    public DTOResponseTopic actualizarTopico(DTOActualizarTopico datos,Usuario usuarioAutenticado){
+        Topico topico = topicoRepository.findById(datos.id()).orElseThrow(
+            () -> new EntityNotFoundException()
+        );
 
-
-    public DTOResponseTopic actualizarTopico(DTOActualizarTopico datos){
-        Usuario userDetailsAuthenticated = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var topico = topicoRepository.getReferenceById(datos.id());
-
-        if(!userDetailsAuthenticated.getId().equals(topico.getAutor().getId())){
-            throw new AuthorizationException("No tienes permisos para editar este topico");
-        }
+        validarAutoria(topico,usuarioAutenticado, "No estas autorizado a realizar esta accion");
 
         validadores.forEach(v->v.validar(datos));
 
         topico.actualizarDatos(datos);
         topicoRepository.save(topico);
 
-        return (new DTOResponseTopic(
-                topico.getId(), topico.getTitulo(),topico.getMensaje(),
-                topico.getFechaCreacion(),topico.getStatus(),
-                new DTOInfoUsuario(topico.getId(), topico.getAutor().getPerfil().getNombre()),
-                topico.getCurso(), topico.getNumRespuestas()));
+        return (mapearADTOResponseTopic(topico));
 
     }
 
-    public DTOResponseTopic registrarTopico(DTORegistroTopico datos){
-        Usuario userDetailsAuthenticated = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Topico topico = new Topico(datos);
+    @Transactional
+    public DTOResponseTopic registrarTopico(DTORegistroTopico datos,Usuario usuarioAutenticado){
 
-        topico.setAutor(userDetailsAuthenticated);
+        Topico topico = new Topico(datos);
+        topico.setAutor(usuarioAutenticado);
 
         validadores.forEach(v->v.validar(datos));
         topicoRepository.save(topico);
 
-        return (new DTOResponseTopic(
-                topico.getId(), topico.getTitulo(),topico.getMensaje(),
-                topico.getFechaCreacion(),topico.getStatus(),
-                new DTOInfoUsuario(topico.getId(), topico.getAutor().getPerfil().getNombre()),
-                topico.getCurso(), topico.getNumRespuestas()));
+        return (mapearADTOResponseTopic(topico));
 
     }
 
-    public void eliminarTopico(Long id){
+    @Transactional
+    public void eliminarTopico(Long id,Usuario usuarioAutenticado){
 
-        Usuario userDetailsAuthenticated = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var topico = topicoRepository.findById(id).orElseThrow(
+            () -> new EntityNotFoundException()
+        );
 
-        var topico = topicoRepository.findById(id);
 
-        if(!topico.isPresent()){
-            throw new EntityNotFoundException("El tópico con ID " + id + " no existe");
-        }
-
-        if(!userDetailsAuthenticated.getId().equals(topico.get().getAutor().getId())){
-            throw new AuthorizationException("No estas autorizado a eliminar este topico");
-        }
-
+        validarAutoria(topico, usuarioAutenticado,"No estas autorizado a realizar esta accion");
         topicoRepository.deleteById(id);
-
     }
 
+    @Transactional(readOnly = true)
     public DTOTopicoYRespuestas retonarDatosTopico(Long id, Pageable pag){
-        Topico topico = topicoRepository.getReferenceById(id);
+        Topico topico = topicoRepository.findById(id).orElseThrow(
+            () -> new EntityNotFoundException()
+        );
 
-        DTOResponseTopic dtoResponseTopic = new DTOResponseTopic(
-                topico.getId(), topico.getTitulo(),topico.getMensaje(),
-                topico.getFechaCreacion(),topico.getStatus(),
-                new DTOInfoUsuario(topico.getId(),topico.getAutor().getPerfil().getNombre()),
-                topico.getCurso(), topico.getNumRespuestas());
+        DTOResponseTopic dtoResponseTopic = mapearADTOResponseTopic(topico);
 
-        Page<DTOResponseRespuesta> dtoResponseRespuestas = respuestaRepository.findAllByTopicoIdOrderBySolucionDesc(id,pag)
-                .map(DTOResponseRespuesta::new);
+        Page<DTOResponseRespuesta> dtoResponseRespuestas = respuestaRepository
+        .findAllByTopicoIdOrderBySolucionDesc(id,pag)
+        .map(DTOResponseRespuesta::new);
 
 
         return new DTOTopicoYRespuestas(dtoResponseTopic,dtoResponseRespuestas);
     }
+
+    @Transactional(readOnly = true)
+    public Page<DTOListadoTopico> listar(Pageable paginacion){
+        return topicoRepository.findAll(paginacion).map(DTOListadoTopico::new);
+    }
+
+
+    private void validarAutoria(Topico topico,Usuario usuarioAutenticado, String mensajeDeError){
+        if(!topico.getAutor().getId().equals(usuarioAutenticado.getId())){
+            throw new AuthorizationException(mensajeDeError);
+        }
+    }
+
+    private DTOResponseTopic mapearADTOResponseTopic(Topico topico) {
+        return new DTOResponseTopic(
+                topico.getId(),
+                topico.getTitulo(),
+                topico.getMensaje(),
+                topico.getFechaCreacion(),
+                topico.getStatus(),
+                new DTOInfoUsuario(topico.getAutor().getId(), topico.getAutor().getPerfil().getNombre()), // ID de Autor corregido
+                topico.getCurso(),
+                topico.getNumRespuestas()
+        );
+    }
+
+
 
 }
