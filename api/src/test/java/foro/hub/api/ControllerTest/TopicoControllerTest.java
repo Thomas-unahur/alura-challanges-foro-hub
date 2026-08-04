@@ -163,14 +163,14 @@ class TopicoControllerTest {
 
         mockMvc.perform(delete("/topicos/10")
                         .with(user(usuarioPrueba)))
-                .andExpect(status().isForbidden()); 3
+                .andExpect(status().isForbidden()); 
     }
 
     @Test
     @DisplayName("Deberia retornar HTTP 404 Not Found cuando el servicio lanza EntityNotFoundException")
     void testObtenerTopicoInexistente() throws Exception {
         when(topicoService.retonarDatosTopico(eq(99L), any(Pageable.class)))
-                .thenThrow(new EntityNotFoundException("Topico no encontrado"));
+                .thenThrow(new EntityNotFoundException("Tópico no encontrado"));
 
         mockMvc.perform(get("/topicos/99"))
                 .andExpect(status().isNotFound()); 
