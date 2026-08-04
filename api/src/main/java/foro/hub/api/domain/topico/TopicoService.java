@@ -19,6 +19,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class TopicoService {
     
     private final TopicoRepository topicoRepository;
@@ -27,7 +28,7 @@ public class TopicoService {
     
     private final RespuestaRepository respuestaRepository;
 
-    @Transactional
+    
     public DTOResponseTopic actualizarTopico(DTOActualizarTopico datos,Usuario usuarioAutenticado){
         Topico topico = topicoRepository.findById(datos.id()).orElseThrow(
             () -> new EntityNotFoundException()
@@ -44,7 +45,7 @@ public class TopicoService {
 
     }
 
-    @Transactional
+   
     public DTOResponseTopic registrarTopico(DTORegistroTopico datos,Usuario usuarioAutenticado){
 
         Topico topico = new Topico(datos);
@@ -57,7 +58,7 @@ public class TopicoService {
 
     }
 
-    @Transactional
+ 
     public void eliminarTopico(Long id,Usuario usuarioAutenticado){
 
         var topico = topicoRepository.findById(id).orElseThrow(
