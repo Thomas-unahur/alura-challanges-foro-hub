@@ -3,20 +3,22 @@ package foro.hub.api.domain.usuarios;
 import foro.hub.api.domain.perfil.Perfil;
 import foro.hub.api.domain.perfil.PerfilRepository;
 import jakarta.validation.ValidationException;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UsuarioService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-    @Autowired
-    private PerfilRepository perfilRepository;
+  
+    private final UsuarioRepository usuarioRepository;
+    
+    private final PerfilRepository perfilRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     public DTOResponseUsuario registrarUsuario(DTORegistroUsuario dtoRegistroUsuario){
 
@@ -32,11 +34,11 @@ public class UsuarioService {
             throw new ValidationException("El nombre de perfil ya esta en uso");
         }
 
-        Usuario nuevoUsuario = new Usuario(dtoRegistroUsuario);
+        
 
       //  nuevoUsuario.setPerfil(new Perfil(dtoRegistroUsuario.nombrePerfil()));
-        nuevoUsuario.setClave(passwordEncoder.encode(nuevoUsuario.getPassword()));
-
+        Usuario nuevoUsuario = new Usuario(dtoRegistroUsuario);
+        nuevoUsuario.setClave(passwordEncoder.encode(dtoRegistroUsuario.clave()));
         usuarioRepository.save(nuevoUsuario);
 
         return (new DTOResponseUsuario(
