@@ -79,7 +79,7 @@ public class AutenticationControllerTest {
     }
 
     @Test
-    @DisplayName("Debería retornar 403 cuando falla la autenticacion")
+    @DisplayName("Debería retornar 401 cuando falla la autenticacion")
     void testAutenticarUsuarioCasoCredencialesInvalidas() throws Exception {
         when(authLoginService.autenticarUsuario(any())).thenThrow(new AuthenticationFailedException("Error"));
 
@@ -88,7 +88,7 @@ public class AutenticationControllerTest {
         mvc.perform(post("/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
-                .andExpect(status().isForbidden()); 
+                .andExpect(status().isUnauthorized()); 
     }
 
     @Test
