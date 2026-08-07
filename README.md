@@ -72,7 +72,7 @@ En los últimos commits se realizaron refactorizaciones y correcciones important
 - Repositorios/Servicios de Usuario: el método para buscar por login fue refactorizado para devolver `Optional` (mejor manejo de ausencias y pruebas más seguras).
 - Limpieza general: eliminación de imports y variables innecesarias en varias clases.
 
-Para ver el historial completo de cambios, revisa las últimas confirmaciones: https://github.com/Thomas-unahur/alura-challanges-foro-hub/commits
+Para ver el historial completo de cambios, revisa los últimos cambios: https://github.com/Thomas-unahur/alura-challanges-foro-hub/commits
 
 ## Tests (qué se agregó y cómo ejecutarlos)
 Se agregaron tests unitarios e de integración para las piezas críticas del dominio:
@@ -129,7 +129,3 @@ Si quieres contribuir:
 - Mejora la documentación o agrega tests.
 
 ---
-
-Si quieres, puedo:
-- Añadir una sección de ejemplos de peticiones (curl / HTTPie) para los endpoints más usados.
-- Detallar comandos para ejecutar la aplicación con perfiles (dev/test) y cómo configurar H2 para debugging.
