@@ -127,7 +127,6 @@ ResponseEntity&lt;Void&gt; eliminarRespuesta(
     }
     Authentication usuarioAutenticado = authenticationManager.authenticate(...);
     var JWTtoken = tokenService.generarToken((Usuario) usuarioAutenticado.getPrincipal());
-    
     return new DTOJWTToken(JWTtoken);
 }</code></pre>
 
@@ -161,10 +160,20 @@ public class TopicoService {
             throw new AuthorizationException(mensajeDeError);
         }
     }
+    private DTOResponseTopic mapearADTOResponseTopic(Topico topico) {
+        return new DTOResponseTopic(
+                topico.getId(),
+                topico.getTitulo(),
+                topico.getMensaje(),
+                topico.getFechaCreacion(),
+                topico.getStatus(),
+                new DTOInfoUsuario(topico.getAutor().getId(), topico.getAutor().getPerfil().getNombre()), // ID de Autor corregido
+                topico.getCurso(),
+                topico.getNumRespuestas()
+        );
+    }
 }</code></pre>
-
 <hr>
-
 <h2 id="documentacion-de-la-api">📖 Documentación de la API</h2>
 <p>La documentación interactiva OpenAPI se genera automáticamente con SpringDoc. Para acceder:</p>
 <ol>
