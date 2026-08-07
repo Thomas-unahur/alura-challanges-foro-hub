@@ -1,298 +1,197 @@
-<h1>Foro-Hub API Rest</h1>
+<h1>💬 Foro-Hub API Rest</h1>
 
-<p>
-  Foro-Hub es una API REST diseñada para gestionar un foro con temática de escuela de programación. Permite realizar operaciones CRUD sobre tópicos, respuestas y usuarios, además de manejar autenticación y autorización.
-</p>
+<p>Foro-Hub es una API REST diseñada para gestionar un foro orientado a una comunidad de programación. Permite realizar operaciones CRUD sobre tópicos, respuestas y usuarios, manejar autenticación segura con JWT y proveer documentación automática con OpenAPI (SpringDoc).</p>
 
-<h2>Índice</h2>
+<h2>📑 Índice</h2>
 <ul>
-  <li><a href="#tecnologias-utilizadas">Tecnologías Utilizadas</a></li>
-  <li><a href="#instalacion-y-configuracion">Instalación y Configuración</a></li>
-  <li><a href="#usos">Usos</a></li>
-  <li><a href="#funcionalidades">Funcionalidades</a></li>
-  <li><a href="#documentacion-api">Documentación API</a></li>
-  <li><a href="#agradecimientos-y-contribuciones">Agradecimientos y Contribuciones</a></li>
-</ul>
-<h2 id="tecnologias-utilizadas">Tecnologías utilizadas</h2>
-<ul>
-  <li>Java 17</li>
-  <li>Spring Boot 3.3.1</li>
-  <li>Spring Security</li>
-  <li>Spring Data JPA</li>
-  <li>MySQL</li>
-  <li>Maven</li>
-  <li>Flyway</li>
-  <li>JWT para autenticación</li>
-  <li>Lombok</li>
-  <li>SpringDoc OpenAPI</li>
+  <li><a href="#tecnologias">Tecnologías</a></li>
+  <li><a href="#instalacion-y-configuracion">Instalación y configuración</a></li>
+  <li><a href="#uso-rapido-endpoints-principales">Uso rápido (Endpoints principales)</a></li>
+  <li><a href="#cambios-recientes-y-refactorizaciones">Cambios recientes y Refactorizaciones</a></li>
+  <li><a href="#tests-cobertura-y-ejecucion">Tests (Cobertura y ejecución)</a></li>
+  <li><a href="#ejemplos-de-codigo">Ejemplos de código</a></li>
+  <li><a href="#documentacion-de-la-api">Documentación de la API</a></li>
+  <li><a href="#agradecimientos-y-contribuciones">Agradecimientos y contribuciones</a></li>
 </ul>
 
-<h2 id="instalacion-y-configuracion">Instalación y Configuración</h2>
-<p>Clona el repositorio:</p>
-<pre>git clone https://github.com/thimo23/alura-challanges-foro-hub.git</pre>
-<p>Instala las dependencias Maven:</p>
-<pre>mvn install</pre>
-<p>Configura tu base de datos MySQL y actualiza el archivo <code>application.properties</code> con tus credenciales.</p>
-<p>Ejecuta el proyecto:</p>
-<pre>mvn spring-boot:run</pre>
+<hr>
 
-<h2 id="usos">Usos</h2>
+<h2 id="tecnologias">🛠️ Tecnologías</h2>
+<ul>
+  <li><strong>Backend:</strong> Java 17, Spring Boot 3.3.x</li>
+  <li><strong>Seguridad:</strong> Spring Security, JWT (JSON Web Tokens)</li>
+  <li><strong>Base de Datos & ORM:</strong> Spring Data JPA, Hibernate, MySQL (Producción), H2 Database (Tests)</li>
+  <li><strong>Herramientas:</strong> Maven, Flyway, Lombok, SpringDoc OpenAPI</li>
+</ul>
+
+<hr>
+
+<h2 id="instalacion-y-configuracion">🚀 Instalación y configuración</h2>
 <ol>
-    <li>
-        <strong>Registrar un nuevo tópico</strong><br>
-        <strong>Endpoint:</strong> POST /topicos<br>
-        <strong>Descripción:</strong> Este endpoint permite registrar un nuevo tópico en la base de datos.<br>
-        <strong>JSON de solicitud:</strong>
-        <pre>
-{
-  "titulo": "Título del tópico",
-  "mensaje": "Mensaje del tópico",
-  "curso": "Nombre del curso"
-}
-        </pre>
-    </li>
-    <li>
-        <strong>Listar todos los tópicos</strong><br>
-        <strong>Endpoint:</strong> GET /topicos<br>
-        <strong>Descripción:</strong> Devuelve una lista paginada de todos los tópicos registrados en la base de datos.<br>
-        <strong>Parámetros:</strong> page, size, sort<br>
-        <strong>Ejemplo de solicitud:</strong> /topicos?page=0&size=10&sort=fechaCreacion
-    </li>
-    <li>
-        <strong>Registrar una nueva respuesta a un tópico</strong><br>
-        <strong>Endpoint:</strong> POST /respuestas<br>
-        <strong>Descripción:</strong> Permite registrar una nueva respuesta asociada a un tópico específico.<br>
-        <strong>JSON de solicitud:</strong>
-        <pre>
-{
-  "mensaje": "Mensaje de la respuesta",
-  "topicoID": "ID del tópico al que se responde"
-}
-        </pre>
-    </li>
-    <li>
-        <strong>Actualizar una respuesta</strong><br>
-        <strong>Endpoint:</strong> PUT /respuestas<br>
-        <strong>Descripción:</strong> Permite editar el contenido de una respuesta existente.<br>
-        <strong>JSON de solicitud:</strong>
-        <pre>
-{
-  "iDRespuesta": "ID de la respuesta a actualizar",
-  "mensaje": "Nuevo mensaje de la respuesta"
-}
-        </pre>
-    </li>
-    <li>
-        <strong>Registrar un nuevo usuario</strong><br>
-        <strong>Endpoint:</strong> POST /usuarios<br>
-        <strong>Descripción:</strong> Registra un nuevo usuario en el sistema.<br>
-        <strong>JSON de solicitud:</strong>
-        <pre>
-{
-  "nombre": "Nombre del usuario",
-  "email": "Email del usuario",
-  "password": "Contraseña"
-}
-        </pre>
-    </li>
-    <li>
-        <strong>Autenticación de usuario</strong><br>
-        <strong>Endpoint:</strong> POST /login<br>
-        <strong>Descripción:</strong> Obtiene un token JWT para un usuario registrado, permitiendo el acceso a endpoints protegidos.<br>
-        <strong>JSON de solicitud:</strong>
-        <pre>
-{
-  "email": "Email del usuario",
-  "password": "Contraseña"
-}
-        </pre>
-    </li>
+  <li>
+    <strong>Clona el repositorio:</strong>
+<pre><code class="language-bash">git clone https://github.com/Thomas-unahur/alura-challanges-foro-hub.git</code></pre>
+  </li>
+  <li>
+    <strong>Entra al módulo API y construye el proyecto:</strong>
+<pre><code class="language-bash">cd api
+mvn install</code></pre>
+  </li>
+  <li>
+    <strong>Configura tu base de datos (MySQL):</strong><br>
+    Actualiza el archivo <code>src/main/resources/application.properties</code> o <code>application.yml</code> con tus credenciales locales.
+  </li>
+  <li>
+    <strong>Ejecuta la aplicación:</strong>
+<pre><code class="language-bash">mvn spring-boot:run
+# o desde el directorio raíz si es multi-módulo:
+cd api && mvn spring-boot:run</code></pre>
+  </li>
 </ol>
 
-<h2 id="funcionalidades">Funcionalidades</h2>
-<p>El proyecto <strong>foro-hub</strong> ofrece una plataforma de discusión para una comunidad enfocada en la programación. A continuación, se detallan sus principales funcionalidades:</p>
+<hr>
 
+<h2 id="uso-rapido-endpoints-principales">⚡ Uso rápido (Endpoints principales)</h2>
 <ul>
-  <li>
-    <h4>Registro de Usuarios</h4>
-    <p>
-      Los usuarios pueden registrarse en la plataforma proporcionando sus datos a través de un formulario. La funcionalidad de registro se maneja en el UsuarioController con el método registrarUsuario. Este método acepta un objeto DTORegistroUsuario, que incluye la información del usuario, y luego utiliza UsuarioService para registrar al usuario en la base de datos.
-    </p>
-    <br>
-    <pre>
-<code>
-@PostMapping
-public ResponseEntity<DTOResponseUsuario> registrarUsuario(@RequestBody @Valid DTORegistroUsuario dtoRegistroUsuario,
-                                                           UriComponentsBuilder uriComponentsBuilder){
-  DTOResponseUsuario nuevoUsuario = usuarioService.registrarUsuario(dtoRegistroUsuario);
-  URI url = uriComponentsBuilder.path("/usuarios/{id}").buildAndExpand(nuevoUsuario.id()).toUri();
-
-  return ResponseEntity.created(url).body(nuevoUsuario);
-}
-</code>
-    </pre>
-  </li>
-
-  <li>
-    <h4>Autenticación</h4> 
-    <p>El sistema de autenticación JWT se implementa en el AutenticacionController. Cuando un usuario intenta autenticarse, se envían sus credenciales al método autenticarUsuario, que utiliza AuthLoginService para verificar las credenciales. Si son válidas, se genera un token JWT que el usuario debe usar para acceder a las rutas protegidas.</p>
-    <br>
-    <pre>
-<code>
-@PostMapping
-public ResponseEntity autenticarUsuario(@RequestBody @Valid DTOAuthUsuario datosAutenticacionUsuario) {
-    DTOJWTToken dtojwtToken = authLoginService.autenticarUsuario(datosAutenticacionUsuario);
-    return ResponseEntity.ok(dtojwtToken);
-}
-</code>
-    </pre>
-  </li>
-
-  <li>
-    <h4>CRUD de Tópicos</h4> 
-    <p>Los usuarios pueden crear nuevos tópicos utilizando el método registrarTopico en TopicoController. Este método acepta un DTORegistroTopico con la información del tópico y utiliza TopicoService para procesar y guardar el tópico en la base de datos.</p>
-    <br>
-    <pre>
-<code>
-@PostMapping
-public ResponseEntity<DTOResponseTopic> registrarTopico(@RequestBody @Valid DTORegistroTopico dtoRegistroTopico,
-                                                        UriComponentsBuilder uriComponentsBuilder){
-    DTOResponseTopic topicoRegistrado = topicoService.registrarTopico(dtoRegistroTopico);
-    URI url = uriComponentsBuilder.path("/topicos/{id}").buildAndExpand(topicoRegistrado.id()).toUri();
-    return ResponseEntity.created(url).body(topicoRegistrado);
-}
-</code>
-    </pre>
-  </li>
-
-  <li>
-    <h4>Respuestas a Tópicos</h4> 
-    <p>Para responder a un tópico, los usuarios utilizan el método registrarRespuesta en RespuestaController. Este método acepta un DTORegistroRespuesta y utiliza RespuestaService para crear y guardar la respuesta en la base de datos.</p>
-    <br>
-    <pre>
-<code>
-@PostMapping
-ResponseEntity registrarRespuesta(@RequestBody @Valid DTORegistroRespuesta dtoRegistroRespuesta,
-                                  UriComponentsBuilder uriComponentsBuilder){
-    DTOResponseRespuesta nuevaRespuesta = respuestaService.registrarRespuesta(dtoRegistroRespuesta);
-    URI url = uriComponentsBuilder.path("/respuestas/{id}").buildAndExpand(nuevaRespuesta.id()).toUri();
-    return ResponseEntity.created(url).body(nuevaRespuesta);
-}
-</code>
-    </pre>
-  </li>
-
-  <li>
-    <h4>Validaciones</h4> 
-    <p>Las validaciones se realizan en varios puntos del flujo de registro y creación de tópicos y respuestas para asegurar la integridad de los datos. Por ejemplo, en TopicoService y RespuestaService, se utilizan listas de validadores (validadores y validadoresDeRespuestas) para aplicar reglas de validación específicas antes de procesar los tópicos y respuestas.</p>
-    <br>
-    <pre>
-<code>
-validadores.forEach(v->v.validar(datos));
-</code>
-    </pre>
-    Para ver más sobre la implementación de validaciones:
-    <br>
-    <a href="./api/src/main/java/foro/hub/api/domain/respuestas/validaciones">Para las Respuestas</a>
-    <br>
-    <a href="./api/src/main/java/foro/hub/api/domain/topico/validaciones">Para los Tópicos</a>
-  </li>
-  <li>
-    <h4>Paginación de Tópicos y Respuestas</h4> 
-    <p>Para listar todos los tópicos registrados en la base de datos, se utiliza el método listadoTopicos en la clase TopicoController. Este método acepta parámetros para la paginación (page y size) y para el ordenamiento (sort). Utiliza el método findAllByOrderByFechaCreacionDesc del TopicoRepository para obtener una página de tópicos ordenados por fecha de creación en orden descendente. Cada tópico obtenido se convierte a un DTOListadoTopico para su presentación.</p>
-    <br>
-    <pre>
-<code>
-@GetMapping
-public ResponseEntity<Page<DTOListadoTopico>> listadoTopicos(
-        @RequestParam(value = "page", defaultValue = "0") int page,
-        @RequestParam(value = "size", defaultValue = "2") int size,
-        @RequestParam(value = "sort", defaultValue = "fechaCreacion") String sort) {
-    Pageable paginacion = PageRequest.of(page, size, Sort.by(Sort.Order.by(sort)));
-    return ResponseEntity.ok(topicoRepository.findAllByOrderByFechaCreacionDesc(paginacion).map(DTOListadoTopico::new));
-}
-</code>
-    </pre>
-  <br>
-  <p>
-    Para listar un tópico específico junto con todas sus respuestas, se utiliza el método retonarDatosTopico en la clase TopicoService. Este método recibe el ID del tópico y un objeto Pageable para la paginación de las respuestas. Primero, obtiene el tópico por su ID y luego utiliza el RespuestaRepository para obtener todas las respuestas asociadas a ese tópico, ordenadas por si son solución o no. Finalmente, se crea un objeto DTOTopicoYRespuestas que incluye la información del tópico y las respuestas paginadas.
-  </p>
-  <br>
-      <pre>
-<code>
-public DTOTopicoYRespuestas retonarDatosTopico(Long id, Pageable pag){
-    Topico topico = topicoRepository.getReferenceById(id);
-    DTOResponseTopic dtoResponseTopic = new DTOResponseTopic(
-            topico.getId(), topico.getTitulo(),topico.getMensaje(),
-            topico.getFechaCreacion(),topico.getStatus(),
-            new DTOInfoUsuario(topico.getId(),topico.getAutor().getPerfil().getNombre()),
-            topico.getCurso(), topico.getNumRespuestas());
-    Page<DTOResponseRespuesta> dtoResponseRespuestas = respuestaRepository.findAllByTopicoIdOrderBySolucionDesc(id,pag)
-            .map(DTOResponseRespuesta::new);
-    return new DTOTopicoYRespuestas(dtoResponseTopic,dtoResponseRespuestas);
-}
-</code>
-    </pre>
-  </li>
-
-  <li>
-    <h4>Documentación API</h4> 
-    <p>La documentación de la API se genera automáticamente utilizando SpringDoc, configurado en SpringDocsConfigurations. Esto facilita a los desarrolladores y usuarios finales comprender cómo utilizar los diferentes endpoints de la API.</p>
-    <br>
-    <pre>
-<code>
-@OpenAPIDefinition(
-    info = @Info(
-        title = "Foro-hub Api Rest",
-        description ="Provee un CRUD para un foro con temática de escuela de programación")
-)
-</code>
-    </pre>
-  </li>
-  <li>
-    <h4>Max Retry/Jail</h4>
-    <p><strong>Guava</strong> es una biblioteca de utilidades de Google para Java que proporciona colecciones, cachés, primitivas, concurrencia, manipulación de cadenas, y más.</p>
-    <p>A partir de sus métodos para manejar caché, creamos la clase <code>IntentosLoginService</code>, que nos permite controlar el número de intentos de logueo fallidos para un nombre de usuario, dando como resultado el bloqueo del mismo por un tiempo determinado.</p>
-    <p>Para más información, visita el enlace a la clase:</p>
-    <a href="./api/src/main/java/foro/hub/api/domain/usuarios/IntentosLoginService.java">IntentosLoginService.java</a>
-    <p>También puedes ver su implementación en la Clase Service:</p>
-    <a href="./api/src/main/java/foro/hub/api/infra/security/AuthLoginService.java">AuthLoginService.java</a>  
-</li>
-<li>
-  <h4>Tests Unitarios y de Integración</h4>
-  <p>En proceso... ⏳</p>
-</li>
+  <li><strong>Registrar tópico:</strong> <code>POST /topicos</code></li>
+  <li><strong>Listar tópicos (paginado):</strong> <code>GET /topicos?page=0&size=10&sort=fechaCreacion</code></li>
+  <li><strong>Registrar respuesta:</strong> <code>POST /respuestas</code></li>
+  <li><strong>Actualizar respuesta:</strong> <code>PUT /respuestas</code></li>
+  <li><strong>Eliminar respuesta:</strong> <code>DELETE /respuestas/{id}</code></li>
+  <li><strong>Registrar usuario:</strong> <code>POST /usuarios</code></li>
+  <li><strong>Login / obtener JWT:</strong> <code>POST /login</code></li>
 </ul>
-<h2 id="documentacion-api">Como acceder a la documentación</h2>
-<p>Para acceder a la documentación de la API de Foro-hub, que ha sido generada utilizando SpringDoc, sigue los siguientes pasos:</p>
-<ol>
-    <li>
-        Asegúrate de que la aplicación esté en ejecución. Si no está en ejecución, puedes iniciarla utilizando Maven con el siguiente comando en la terminal, ubicándote en el directorio raíz del proyecto (donde se encuentra el archivo <code>pom.xml</code>):
-        <pre>mvn spring-boot:run</pre>
-    </li>
-    <li>
-        Una vez que la aplicación esté en ejecución, abre un navegador web y visita la URL de la documentación de la API generada por SpringDoc. La URL por defecto para acceder a la documentación de la API es:
-        <pre>http://localhost:8080/swagger-ui/index.html</pre>
-        Reemplaza <code>localhost</code> y <code>8080</code> si tu aplicación se está ejecutando en una dirección o puerto diferente.
-    </li>
-    <li>
-        En la página de documentación de la API, verás una interfaz de usuario interactiva proporcionada por Swagger UI, donde se listan todos los endpoints disponibles en la API de Foro-hub. La documentación incluye detalles como los métodos HTTP (GET, POST, PUT, DELETE), los parámetros de entrada, los modelos de datos, y las respuestas esperadas para cada endpoint.
-    </li>
-    <li>
-        Puedes interactuar con la API directamente desde esta interfaz de usuario. Para hacerlo, haz clic en cualquier endpoint listado para expandir sus detalles. Luego, puedes probar el endpoint haciendo clic en el botón <strong>Try it out</strong>, llenando los parámetros necesarios si los hay, y finalmente haciendo clic en <strong>Execute</strong>. Verás la respuesta de la API directamente en la interfaz.
-    </li>
-</ol>
+<blockquote><strong>Nota:</strong> Los cuerpos de ejemplo para cada endpoint en formato JSON están disponibles en la documentación OpenAPI (Swagger UI).</blockquote>
 
-<h2 id="agradecimientos-y-contribuciones">Agradecimientos y Contribuciones</h2>
-<p>Quiero expresar mi más sincero agradecimiento al programa <strong>Oracle Next Education</strong> y a la plataforma <strong>Alura</strong> por ofrecerme este desafío. Gracias a esta experiencia, he podido diversificar mis conocimientos en el desarrollo backend y mejorar mis habilidades técnicas.</p>
+<hr>
 
-<h3>Contribuciones</h3>
-
-<p>Si deseas contribuir a este proyecto, aquí hay algunas maneras en las que puedes hacerlo:</p>
-
+<h2 id="cambios-recientes-y-refactorizaciones">🔄 Cambios recientes y Refactorizaciones</h2>
+<p>En los últimos commits se realizaron refactorizaciones y correcciones importantes. Los puntos más relevantes son:</p>
 <ul>
-    <li><strong>Reportar Issues:</strong> Si encuentras errores o tienes sugerencias de mejora, no dudes en abrir un issue en este repositorio.</li>
-    <li><strong>Pull Requests:</strong> Si tienes mejoras o nuevas funcionalidades que deseas implementar, ¡estaré encantado de revisar tus pull requests!</li>
-    <li><strong>Documentación:</strong> Ayuda a mejorar la documentación del proyecto. Cualquier aportación en este sentido es muy valiosa.</li>
-    <li><strong>Feedback:</strong> Cualquier comentario sobre el proyecto es bienvenido. Tu opinión puede ayudar a hacer de este un mejor recurso para todos.</li>
+  <li><strong>Módulo de Tópicos (Controller y Service):</strong> Limpieza de imports, corrección de dependencias y mejora en la organización del código para facilitar la inyección por constructor y las pruebas aisladas.</li>
+  <li><strong>Autenticación:</strong> El controlador de autenticación ahora devuelve <code>ResponseEntity&lt;DTOJWTToken&gt;</code> (tipo genérico explícito) para mayor claridad en el contrato de la API.</li>
+  <li><strong>RespuestaController:</strong>
+    <ul>
+      <li>Se añadió la inyección de la entidad directamente en los parámetros (<code>@AuthenticationPrincipal Usuario</code>) para los endpoints que crean, actualizan o eliminan respuestas, desacoplando la seguridad de la capa de servicio.</li>
+      <li>Se agregó el endpoint para eliminar respuestas (<code>DELETE /respuestas/{id}</code>).</li>
+    </ul>
+  </li>
+  <li><strong>Perfil:</strong> Se agregaron métodos <em>setters</em> en la entidad <code>Perfil</code> para facilitar la preparación de datos (<em>setup</em>) en los tests.</li>
+  <li><strong>Repositorios/Servicios de Usuario:</strong> El método para buscar por login (<code>findByLogin</code>) fue refactorizado para devolver un <code>Optional</code>, garantizando un mejor manejo de ausencias y previniendo excepciones de tipo <code>NullPointerException</code>.</li>
+  <li><strong>Limpieza general:</strong> Eliminación de imports sin uso y variables innecesarias.</li>
+</ul>
+
+<hr>
+
+<h2 id="tests-cobertura-y-ejecucion">🧪 Tests (Cobertura y ejecución)</h2>
+<p>Se implementó una suite completa de pruebas automatizadas (unitarias y de integración) para las piezas críticas del dominio:</p>
+<ul>
+  <li><strong>Tópicos:</strong> Pruebas unitarias que validan flujos de listado, creación, obtención de un tópico con sus respuestas y manejo de errores (ej. <code>EntityNotFoundException</code>).</li>
+  <li><strong>Usuarios:</strong> Pruebas de integración sobre repositorios utilizando una base de datos en memoria (H2) para validar el registro, las búsquedas y los flujos de autenticación.</li>
+  <li><strong>Respuestas:</strong> Pruebas de creación, actualización y eliminación, verificando estrictamente los permisos y la autoría de los recursos.</li>
+</ul>
+<p><strong>Características de la suite:</strong></p>
+<ul>
+  <li>Las pruebas de persistencia utilizan <strong>H2 Database</strong> para evitar ensuciar la base de datos de MySQL durante la ejecución.</li>
+  <li>Se abstrajo el tiempo y se utilizaron <em>Mocks</em> para garantizar que las pruebas se ejecuten en milisegundos.</li>
+</ul>
+<p><strong>Cómo ejecutar los tests:</strong></p>
+<p>Desde el directorio raíz (o dentro de la carpeta <code>api</code>):</p>
+<pre><code class="language-bash">cd api
+mvn test</code></pre>
+<hr>
+
+<h2 id="ejemplos-de-codigo">💻 Ejemplos de código (Métodos clave)</h2>
+<p>A continuación, se exponen fragmentos representativos de la arquitectura implementada:</p>
+<p><strong>1. RespuestaController — Uso de <code>@AuthenticationPrincipal</code></strong></p>
+<pre><code class="language-java">@PostMapping
+ResponseEntity&lt;DTOResponseRespuesta&gt; registrarRespuesta(
+        @RequestBody @Valid DTORegistroRespuesta dtoRegistroRespuesta,
+        @AuthenticationPrincipal Usuario usuarioAutenticado,
+        UriComponentsBuilder uriComponentsBuilder)
+
+@PutMapping
+ResponseEntity&lt;DTOResponseRespuesta&gt; actualizarRespuesta(
+        @RequestBody @Valid DTOActualizarRespuesta dtoActualizarRespuesta,
+        @AuthenticationPrincipal Usuario usuarioAutenticado)
+
+@DeleteMapping("/{id}")
+ResponseEntity&lt;Void&gt; eliminarRespuesta(
+        @PathVariable Long id,
+        @AuthenticationPrincipal Usuario usuarioAutenticado)</code></pre>
+
+<p><strong>2. AuthLoginService — Orquestación de Autenticación</strong></p>
+<pre><code class="language-java">public DTOJWTToken autenticarUsuario(@RequestBody @Valid DTOAuthUsuario datosAutenticacionUsuario) {
+    if (intentosLoginService.estaBloqueado(datosAutenticacionUsuario.login())) {
+        throw new AuthenticationFailedException("Usuario bloqueado por múltiples intentos fallidos");
+    }
+    Authentication usuarioAutenticado = authenticationManager.authenticate(...);
+    var JWTtoken = tokenService.generarToken((Usuario) usuarioAutenticado.getPrincipal());
+    return new DTOJWTToken(JWTtoken);
+}</code></pre>
+
+<p><strong>3. TopicoService — Lógica transaccional y validación de reglas de negocio</strong></p>
+<pre><code class="language-java">@Service
+@RequiredArgsConstructor
+@Transactional
+public class TopicoService {
+    
+    private final TopicoRepository topicoRepository;
+    private final List&lt;ValidadorDeDuplicados&gt; validadores;
+    private final RespuestaRepository respuestaRepository;
+
+    public DTOResponseTopic actualizarTopico(DTOActualizarTopico datos, Usuario usuarioAutenticado){
+        Topico topico = topicoRepository.findById(datos.id())
+                .orElseThrow(() -&gt; new EntityNotFoundException("Tópico no encontrado"));
+
+        validarAutoria(topico, usuarioAutenticado, "No estás autorizado a realizar esta acción");
+        validadores.forEach(v -&gt; v.validar(datos));
+
+        topico.actualizarDatos(datos);
+        topicoRepository.save(topico);
+
+        return mapearADTOResponseTopic(topico);
+    }
+
+    // Resto de operaciones (registrar, eliminar, listar)...
+    
+    private void validarAutoria(Topico topico, Usuario usuarioAutenticado, String mensajeDeError){
+        if(!topico.getAutor().getId().equals(usuarioAutenticado.getId())){
+            throw new AuthorizationException(mensajeDeError);
+        }
+    }
+    private DTOResponseTopic mapearADTOResponseTopic(Topico topico) {
+        return new DTOResponseTopic(
+                topico.getId(),
+                topico.getTitulo(),
+                topico.getMensaje(),
+                topico.getFechaCreacion(),
+                topico.getStatus(),
+                new DTOInfoUsuario(topico.getAutor().getId(), topico.getAutor().getPerfil().getNombre()), // ID de Autor corregido
+                topico.getCurso(),
+                topico.getNumRespuestas()
+        );
+    }
+}</code></pre>
+<hr>
+<h2 id="documentacion-de-la-api">📖 Documentación de la API</h2>
+<p>La documentación interactiva OpenAPI se genera automáticamente con SpringDoc. Para acceder:</p>
+<ol>
+  <li>Ejecuta la aplicación.</li>
+  <li>Abre en tu navegador:
+<pre><code class="language-text">http://localhost:8080/swagger-ui/index.html</code></pre>
+  </li>
+</ol>
+<p><em>(Cambia el host o el puerto si tu aplicación corre en otra dirección).</em></p>
+
+<hr>
+
+<h2 id="agradecimientos-y-contribuciones">🤝 Agradecimientos y contribuciones</h2>
+<p>Quiero expresar mi agradecimiento al programa <strong>Oracle Next Education</strong> y a <strong>Alura</strong> por el desafío y el excelente material provisto.</p>
+
+<p><strong>Si quieres contribuir:</strong></p>
+<ul>
+  <li>Abre <em>issues</em> para reportar bugs o sugerir mejoras.</li>
+  <li>Envía <em>pull requests</em> con refactorizaciones o nuevas funcionalidades.</li>
+  <li>Toda mejora en la documentación o cobertura de tests es bienvenida.</li>
 </ul>
