@@ -8,6 +8,7 @@ Foro-Hub es una API REST diseñada para gestionar un foro orientado a una comuni
 - Uso rápido (endpoints principales)
 - Cambios recientes / Refactorizaciones
 - Tests (qué se agregó y cómo ejecutarlos)
+- Ejemplos de código
 - Documentación de la API
 - Agradecimientos y cómo contribuir
 
@@ -101,12 +102,164 @@ mvn test
 mvn -pl api test
 ```
 
-Dónde revisar los tests:
+D dónde revisar los tests:
 - Código de tests: api/src/test/java/foro/hub/api/
   - ControllerTest (p. ej. TopicoControllerTest)
   - ServiceTest (p. ej. TopicoServiceTest, RespuestaServiceTest, UsuarioServiceTest)
 
 Nota: los tests agregados cubren los flujos más relevantes y además sirven para prevenir regresiones provocadas por refactorizaciones.
+
+## Ejemplos de código (métodos clave)
+A continuación se muestran las firmas de los métodos más importantes y representativos (solo lo esencial):
+
+1) RespuestaController — crear / actualizar / eliminar (uso de @AuthenticationPrincipal)
+
+```java
+// api/src/main/java/foro/hub/api/controller/RespuestaController.java
+@PostMapping
+ResponseEntity<DTOResponseRespuesta> registrarRespuesta(@RequestBody @Valid DTORegistroRespuesta dtoRegistroRespuesta,
+                                                        @AuthenticationPrincipal Usuario usuarioAutenticado,
+                                                        UriComponentsBuilder uriComponentsBuilder)
+
+@PutMapping
+ResponseEntity<DTOResponseRespuesta> actualizarRespuesta(@RequestBody @Valid DTOActualizarRespuesta dtoActualizarRespuesta,
+                                                          @AuthenticationPrincipal Usuario usuarioAutenticado)
+
+@DeleteMapping("/{id}")
+ResponseEntity<Void> eliminarRespuesta(@PathVariable Long id,
+                                      @AuthenticationPrincipal Usuario usuarioAutenticado)
+```
+
+2) AuthLoginService — método principal de autenticación (control de intentos y emisión de JWT)
+
+```java
+// api/src/main/java/foro/hub/api/infra/security/AuthLoginService.java
+public DTOJWTToken autenticarUsuario(@RequestBody @Valid DTOAuthUsuario datosAutenticacionUsuario) {
+    if (intentosLoginService.estaBloqueado(datosAutenticacionUsuario.login())) throw ...
+    Authentication usuarioAutenticado = authenticationManager.authenticate(...)
+    var JWTtoken = tokenService.generarToken((Usuario) usuarioAutenticado.getPrincipal());
+    return new DTOJWTToken(JWTtoken);
+}
+```
+
+3) TopicoService — implementación completa (registro, obtención con respuestas y validación de autoría)
+
+```java
+// api/src/main/java/foro/hub/api/domain/topico/TopicoService.java
+package foro.hub.api.domain.topico;
+
+import foro.hub.api.domain.respuestas.DTOResponseRespuesta;
+import foro.hub.api.domain.respuestas.RespuestaRepository;
+import foro.hub.api.domain.topico.validaciones.ValidadorDeDuplicados;
+import foro.hub.api.domain.usuarios.DTOInfoUsuario;
+import foro.hub.api.domain.usuarios.Usuario;
+import foro.hub.api.infra.errores.AuthorizationException;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class TopicoService {
+    
+    private final TopicoRepository topicoRepository;
+    
+    private final List<ValidadorDeDuplicados> validadores;
+    
+    private final RespuestaRepository respuestaRepository;
+
+    
+    public DTOResponseTopic actualizarTopico(DTOActualizarTopico datos,Usuario usuarioAutenticado){
+        Topico topico = topicoRepository.findById(datos.id()).orElseThrow(
+            () -> new EntityNotFoundException()
+        );
+
+        validarAutoria(topico,usuarioAutenticado, "No estas autorizado a realizar esta accion");
+
+        validadores.forEach(v->v.validar(datos));
+
+        topico.actualizarDatos(datos);
+        topicoRepository.save(topico);
+
+        return (mapearADTOResponseTopic(topico));
+
+    }
+
+   
+    public DTOResponseTopic registrarTopico(DTORegistroTopico datos,Usuario usuarioAutenticado){
+
+        Topico topico = new Topico(datos);
+        topico.setAutor(usuarioAutenticado);
+
+        validadores.forEach(v->v.validar(datos));
+        topicoRepository.save(topico);
+
+        return (mapearADTOResponseTopic(topico));
+
+    }
+
+ 
+    public void eliminarTopico(Long id,Usuario usuarioAutenticado){
+
+        var topico = topicoRepository.findById(id).orElseThrow(
+            () -> new EntityNotFoundException()
+        );
+
+
+        validarAutoria(topico, usuarioAutenticado,"No estas autorizado a realizar esta accion");
+        topicoRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public DTOTopicoYRespuestas retonarDatosTopico(Long id, Pageable pag){
+        Topico topico = topicoRepository.findById(id).orElseThrow(
+            () -> new EntityNotFoundException()
+        );
+
+        DTOResponseTopic dtoResponseTopic = mapearADTOResponseTopic(topico);
+
+        Page<DTOResponseRespuesta> dtoResponseRespuestas = respuestaRepository
+        .findAllByTopicoIdOrderBySolucionDesc(id,pag)
+                .map(DTOResponseRespuesta::new);
+        
+        return new DTOTopicoYRespuestas(dtoResponseTopic,dtoResponseRespuestas);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<DTOListadoTopico> listar(Pageable paginacion){
+        return topicoRepository.findAll(paginacion).map(DTOListadoTopico::new);
+    }
+
+
+    private void validarAutoria(Topico topico,Usuario usuarioAutenticado, String mensajeDeError){
+        if(!topico.getAutor().getId().equals(usuarioAutenticado.getId())){
+            throw new AuthorizationException(mensajeDeError);
+        }
+    }
+
+    private DTOResponseTopic mapearADTOResponseTopic(Topico topico) {
+        return new DTOResponseTopic(
+                topico.getId(),
+                topico.getTitulo(),
+                topico.getMensaje(),
+                topico.getFechaCreacion(),
+                topico.getStatus(),
+                new DTOInfoUsuario(topico.getAutor().getId(), topico.getAutor().getPerfil().getNombre()), // ID de Autor corregido
+                topico.getCurso(),
+                topico.getNumRespuestas()
+        );
+    }
+
+
+
+}
+```
 
 ## Documentación de la API
 La documentación OpenAPI se genera automáticamente con SpringDoc. Para acceder:
